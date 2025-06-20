@@ -1,0 +1,5 @@
+@import url('./main-layout.css');
+@import url('./views/bienvenidoa-to-do-list-app-view.css');
+@import url('./views/tareas-pendientes-view.css');
+@import url('./views/tareas-realizadas-view.css');
+@import url('./views/papelera-view.css');
