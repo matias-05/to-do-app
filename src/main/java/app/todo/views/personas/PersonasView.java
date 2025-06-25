@@ -9,6 +9,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -79,20 +80,20 @@ public class PersonasView extends Composite<VerticalLayout> {
             selectedPerson = event.getValue();
         });
         
-        // Configuración del botón de crear persona
-        Button createBtn = new Button("Crear Persona", event -> {
+        //  Configuración del botón de crear persona
+        Button createBtn = new Button("Crear Persona", VaadinIcon.PLUS_CIRCLE_O.create(), event -> {
             personService.createPerson(name.getValue(), lastName.getValue(), dni.getValue());
             name.clear();
             lastName.clear();   
             dni.clear();
             refreshGrid();
         });
-        createBtn.setWidth("150px");
+        createBtn.setWidth("170px");
         createBtn.setHeight("30px");
         createBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        // Configuración del botón de eliminar persona
-        Button deleteBtn = new Button("Borrar Persona", event -> {
+        //  Configuración del botón de eliminar persona
+        Button deleteBtn = new Button("Borrar Persona", VaadinIcon.TRASH.create(), event -> {
             if (selectedPerson != null) {
                 Dialog confirmDialog = new Dialog();
                 confirmDialog.add(new Span("¿Estás seguro de que borrar esta persona?"));
@@ -110,6 +111,8 @@ public class PersonasView extends Composite<VerticalLayout> {
             }
         });
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        deleteBtn.setWidth("170px");
+        deleteBtn.setHeight("30px");
 
 
         // Configuración del frontend
@@ -122,7 +125,6 @@ public class PersonasView extends Composite<VerticalLayout> {
         layoutRow.addClassName(Gap.MEDIUM);
         layoutRow.setWidth("100%");
         layoutRow.setHeight("80px");
-        layoutRow.setAlignSelf(FlexComponent.Alignment.START, createBtn);
         layoutRow.setAlignSelf(FlexComponent.Alignment.CENTER, name);
         layoutRow.setAlignSelf(FlexComponent.Alignment.CENTER, lastName);
         layoutRow.setAlignSelf(FlexComponent.Alignment.CENTER, dni);

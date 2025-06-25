@@ -3,6 +3,7 @@ package app.todo.views.tareaspendientes;
 //#region imports
 import org.springframework.data.domain.Pageable;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
+
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -13,6 +14,8 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -23,6 +26,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+
 import app.todo.data.Person;
 import app.todo.data.Task;
 import app.todo.services.PersonService;
@@ -98,9 +102,9 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
         }).setHeader("Marcar como hecho").setAutoWidth(true).setFlexGrow(0); 
         taskGrid.addColumn(Task::getDescription).setHeader("Descripción").setAutoWidth(true);
         taskGrid.addColumn(Task::getDueDate).setHeader("Vencimiento").setAutoWidth(true);
-        taskGrid.addColumn(task -> task.getPerson().getName()).setHeader("Asignado a").setAutoWidth(true);
+        taskGrid.addColumn(task -> task.getPerson() != null ? task.getPerson().getName() + " " + task.getPerson().getLastName() : "").setHeader("Asignado a").setAutoWidth(true);
         taskGrid.addComponentColumn(task -> {
-            Button deleteBtn = new Button(VaadinIcon.CLOSE.create(), event -> {
+            Button deleteBtn = new Button(VaadinIcon.TRASH.create(), event -> {
                 Dialog confirmDialog = new Dialog();
                 confirmDialog.add(new Span("¿Estás seguro de que deseas enviar esta tarea a la papelera?"));
                 Button confirmButton = new Button("Borrar", e -> {
@@ -123,9 +127,11 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
         // Configuración del botón de crear tarea
         Button createBtn = new Button("Create", event -> {
             taskService.createTask(description.getValue(), dueDate.getValue(), assignedTo.getValue());
-            taskGrid.getDataProvider().refreshAll();
             description.clear();
             dueDate.clear();
+            assignedTo.clear();
+            Notification.show("Task added", 3000, Notification.Position.BOTTOM_END)
+                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             refreshGrid();
         });
         createBtn.setText("Agregar");
@@ -144,12 +150,8 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
         layoutRow.setWidth("100%");
         layoutRow.setHeight("80px");
         layoutRow.setAlignSelf(FlexComponent.Alignment.CENTER, createBtn);
-        getContent().add(layoutRow);
-        layoutRow.add(description);
-        layoutRow.add(dueDate);
-        layoutRow.add(createBtn);
+        layoutRow.add(description, dueDate, assignedTo, createBtn);
         getContent().add(layoutRow, taskGrid);
-        layoutRow.add(description, dueDate, assignedTo, createBtn);    
         refreshGrid();
     }
     
