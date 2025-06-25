@@ -5,12 +5,14 @@ import java.time.LocalDate;
 import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 //#endregion
 
@@ -42,14 +44,15 @@ public class Task extends AbstractEntity<Long> {
     @Column(name = "in_trash", columnDefinition = "boolean default false")
     private boolean inTrash = false;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "person_id")
+    @NotNull
+    private Person person;
+
     @Override
     public @Nullable Long getId() {
         return id;
     }
-
-    @ManyToOne
-    @JoinColumn(name = "person_id")
-    private Person person;
 
     public void setDone(Boolean done){
         this.done = done;

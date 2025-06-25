@@ -3,7 +3,6 @@ package app.todo.views.tareaspendientes;
 //#region imports
 import org.springframework.data.domain.Pageable;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
-
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -26,7 +25,6 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-
 import app.todo.data.Person;
 import app.todo.data.Task;
 import app.todo.services.PersonService;
@@ -61,7 +59,6 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
 
         // Configuración de fecha de vencimiento
         DatePicker dueDate = new DatePicker();
-        dueDate.setPlaceholder("Due date");
         dueDate.setAriaLabel("Due date");
         dueDate.setLabel("Vencimiento de la tarea");
         dueDate.setWidth("190px");
@@ -69,7 +66,6 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
 
         // Configuración de persona encargada
         ComboBox<Person> assignedTo = new ComboBox<>();
-        assignedTo.setPlaceholder("Asignar a");
         assignedTo.setAriaLabel("Assigned to");
         assignedTo.setLabel("Asignar a");
         assignedTo.setItems(personService.list(Pageable.unpaged()).stream().toList());
@@ -82,8 +78,7 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
         taskGrid.addComponentColumn(task -> {
             Button doneBtn = new Button(VaadinIcon.CHECK_CIRCLE.create(), event -> {
                 Dialog confirmDialog = new Dialog();
-                confirmDialog.add(new Span("¿Estás seguro de que deseas marcar esta tarea como hecha?"));
-
+                confirmDialog.add(new Span("¿Estás seguro de que deseas marcar esta tarea como completada?"));
                 Button confirmButton = new Button("Aceptar", e -> {
                     task.setDone(true);
                     taskService.updateTask(task);
@@ -99,7 +94,7 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
             });
             doneBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             return doneBtn;
-        }).setHeader("Marcar como hecho").setAutoWidth(true).setFlexGrow(0); 
+        }).setHeader("Marcar como completada").setAutoWidth(true).setFlexGrow(0); 
         taskGrid.addColumn(Task::getDescription).setHeader("Descripción").setAutoWidth(true);
         taskGrid.addColumn(Task::getDueDate).setHeader("Vencimiento").setAutoWidth(true);
         taskGrid.addColumn(task -> task.getPerson() != null ? task.getPerson().getName() + " " + task.getPerson().getLastName() : "").setHeader("Asignado a").setAutoWidth(true);

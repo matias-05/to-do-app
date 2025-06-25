@@ -10,6 +10,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -42,6 +44,7 @@ public class PersonasView extends Composite<VerticalLayout> {
 
         //Configuración de lastName
         TextField lastName = new TextField();
+        lastName.setReadOnly(true);
         lastName.setPlaceholder("Escribe el apellido aquí");
         lastName.setAriaLabel("Apellido");
         lastName.setMaxLength(Person.NAME_MAX_LENGTH);
@@ -52,6 +55,7 @@ public class PersonasView extends Composite<VerticalLayout> {
 
         // Configuración de name
         TextField name = new TextField();
+        name.setReadOnly(true);
         name.setPlaceholder("Escribe el nombre aquí");
         name.setAriaLabel("Nombre");
         name.setMaxLength(Person.NAME_MAX_LENGTH);
@@ -62,6 +66,7 @@ public class PersonasView extends Composite<VerticalLayout> {
 
         // Configuración de dni
         TextField dni = new TextField();
+        dni.setReadOnly(true);
         dni.setPlaceholder("Escribe el dni aquí");
         dni.setAriaLabel("Dni");
         dni.setMaxLength(9);
@@ -82,6 +87,11 @@ public class PersonasView extends Composite<VerticalLayout> {
         
         //  Configuración del botón de crear persona
         Button createBtn = new Button("Crear Persona", VaadinIcon.PLUS_CIRCLE_O.create(), event -> {
+            if (name.isEmpty() || lastName.isEmpty() || dni.isEmpty()) {
+                Notification.show("Por favor, complete todos los campos", 2000, Notification.Position.MIDDLE)
+                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
+            }
             personService.createPerson(name.getValue(), lastName.getValue(), dni.getValue());
             name.clear();
             lastName.clear();   
@@ -108,11 +118,24 @@ public class PersonasView extends Composite<VerticalLayout> {
                 HorizontalLayout buttons = new HorizontalLayout(confirmButton, cancelButton);
                 confirmDialog.add(buttons);
                 confirmDialog.open();
+            } else {
+                Notification.show("Seleccione una persona de la lista", 2000, Notification.Position.MIDDLE)
+                .addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         deleteBtn.setWidth("170px");
         deleteBtn.setHeight("30px");
+
+        // Configuracion boton nuevo
+        Button nuevoBtn = new Button("Nuevo", event -> {
+            name.clear();
+            lastName.clear();
+            dni.clear();
+            name.setReadOnly(false);
+            lastName.setReadOnly(false);
+            dni.setReadOnly(false);
+        });
 
 
         // Configuración del frontend
@@ -130,7 +153,7 @@ public class PersonasView extends Composite<VerticalLayout> {
         layoutRow.setAlignSelf(FlexComponent.Alignment.CENTER, dni);
         getContent().add(layoutRow);
         layoutRow.add(name, lastName, dni);
-        content.add(createBtn, deleteBtn, personGrid);
+        content.add(nuevoBtn, createBtn, deleteBtn, personGrid);
         getContent().add(content);
         refreshGrid();
         

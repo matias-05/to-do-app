@@ -40,8 +40,7 @@ public class Person {
     @Size(max = 9)
     private String dni;
 
-    @Column(name = "tareasAsignadas")
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "person")
     private List<Task> tasks = new ArrayList<>();
 
     public List<Task> getTasks() {

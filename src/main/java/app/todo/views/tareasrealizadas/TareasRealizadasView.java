@@ -5,6 +5,8 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -33,6 +35,7 @@ public class TareasRealizadasView extends Composite<VerticalLayout> {
         taskGrid = new Grid<>(Task.class, false);
         taskGrid.addColumn(Task::getDescription).setHeader("Descripción").setAutoWidth(true);
         taskGrid.addColumn(Task::getDueDate).setHeader("Vencimiento").setAutoWidth(true);
+        taskGrid.addColumn(task -> task.getPerson() != null ? task.getPerson().getName() + " " + task.getPerson().getLastName() : "").setHeader("Realizada por").setAutoWidth(true);
         taskGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         taskGrid.asSingleSelect().addValueChangeListener(event -> {
             selectedTask = event.getValue();
@@ -51,6 +54,9 @@ public class TareasRealizadasView extends Composite<VerticalLayout> {
                 refreshGrid();
                 selectedTask = null;
                 taskGrid.deselectAll();
+            } else {
+                Notification.show("Seleccione una tarea de la lista", 2000, Notification.Position.MIDDLE)
+                .addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
 

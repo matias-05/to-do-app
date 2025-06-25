@@ -6,7 +6,11 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -47,10 +51,24 @@ public class PapeleraView extends Composite<VerticalLayout> {
         btnEliminar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         btnEliminar.addClickListener(e -> {
             if (selectedTask != null) {
-                taskService.deleteTask(selectedTask);
-                refreshGrid();
-                selectedTask = null;
-                taskGrid.deselectAll();
+                Dialog confirmDialog = new Dialog();
+                confirmDialog.add(new Span("¿Estás seguro de que deseas eliminar esta tarea definitivamente?"));
+                Button confirmButton = new Button("Eliminar", a -> {
+                    taskService.deleteTask(selectedTask);
+                    refreshGrid();
+                    selectedTask = null;
+                    taskGrid.deselectAll();
+                    confirmDialog.close();
+                });
+                Button cancelButton = new Button("Cancelar", a -> confirmDialog.close());
+                confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+                cancelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                HorizontalLayout buttons = new HorizontalLayout(confirmButton, cancelButton);
+                confirmDialog.add(buttons);
+                confirmDialog.open();
+            } else {
+                Notification.show("Seleccione una tarea de la lista", 2000, Notification.Position.MIDDLE)
+                .addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
 
@@ -66,6 +84,9 @@ public class PapeleraView extends Composite<VerticalLayout> {
                 refreshGrid();
                 selectedTask = null;
                 taskGrid.deselectAll();
+            } else {
+                Notification.show("Seleccione una tarea de la lista", 2000, Notification.Position.MIDDLE)
+                .addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
 
