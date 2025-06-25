@@ -1,4 +1,5 @@
 package app.todo.views.tareasrealizadas;
+
 //#region imports
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -9,7 +10,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import app.todo.data.Task;
 import app.todo.services.TaskService;
 import org.springframework.data.domain.Pageable;
@@ -26,35 +26,23 @@ public class TareasRealizadasView extends Composite<VerticalLayout> {
     private Task selectedTask;
 
     public TareasRealizadasView(TaskService taskService) {
-        this.taskService = taskService;
-        taskGrid = new Grid<>(Task.class, false);
         HorizontalLayout layoutRow = new HorizontalLayout();
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        Button btnRecuperar = new Button();
-        btnRecuperar.setText("Recuperar tarea");
-        btnRecuperar.setWidth("min-content");
-        btnRecuperar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
-        layoutRow.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.setHeight("80px");
-        layoutRow2.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow2);
-        layoutRow2.addClassName(Gap.MEDIUM);
-        layoutRow2.setWidth("100%");
-        layoutRow2.getStyle().set("flex-grow", "1");
-        getContent().add(layoutRow);
-        getContent().add(layoutRow2);
-        layoutRow.add(btnRecuperar);
+        this.taskService = taskService;
+
+        // Configuración de grid
+        taskGrid = new Grid<>(Task.class, false);
         taskGrid.addColumn(Task::getDescription).setHeader("Descripción").setAutoWidth(true);
         taskGrid.addColumn(Task::getDueDate).setHeader("Vencimiento").setAutoWidth(true);
         taskGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         taskGrid.asSingleSelect().addValueChangeListener(event -> {
             selectedTask = event.getValue();
         });
+
+        // Configuración de boton recuperar
+        Button btnRecuperar = new Button();
+        btnRecuperar.setText("Regresar a pendientes");
+        btnRecuperar.setWidth("min-content");
+        btnRecuperar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnRecuperar.addClickListener(e -> {
             if (selectedTask != null) {
                 selectedTask.setDone(false);
@@ -65,10 +53,25 @@ public class TareasRealizadasView extends Composite<VerticalLayout> {
                 taskGrid.deselectAll();
             }
         });
+
+        // Configuración de frontend
+        getContent().setWidth("100%");
+        getContent().getStyle().set("flex-grow", "1");
+        layoutRow.setWidthFull();
+        getContent().setFlexGrow(1.0, layoutRow);
+        layoutRow.setWidth("100%");
+        layoutRow.setHeight("100%");
+        layoutRow.setWidthFull();
+        getContent().setFlexGrow(1.0, layoutRow);
+        layoutRow.setWidth("100%");
+        layoutRow.getStyle().set("flex-grow", "1");
+        getContent().add(layoutRow);
+        layoutRow.add(btnRecuperar);
         getContent().add(taskGrid);
         refreshGrid();
     }
 
+    //Métodos
     private void refreshGrid() {
         taskGrid.setItems(
         taskService.list(Pageable.unpaged())

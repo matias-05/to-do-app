@@ -17,7 +17,7 @@ public class BienvenidoaToDoListAppView extends Composite<VerticalLayout> {
         H1 h1 = new H1();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        h1.setText("Tareas");
+        h1.setText("Ingresa a unas de las pestañas de la izquierda para comenzar a gestionar tus tareas");
         h1.setWidth("max-content");
         getContent().add(h1);
     }

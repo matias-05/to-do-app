@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 //#endregion
@@ -36,13 +38,18 @@ public class Task extends AbstractEntity<Long> {
 
     @Column(name = "done", columnDefinition = "boolean default false")
     private Boolean done = false;
-
+    
+    @Column(name = "in_trash", columnDefinition = "boolean default false")
     private boolean inTrash = false;
 
     @Override
     public @Nullable Long getId() {
         return id;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person person;
 
     public void setDone(Boolean done){
         this.done = done;
@@ -82,5 +89,13 @@ public class Task extends AbstractEntity<Long> {
 
     public void setDueDate(@Nullable LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public Person getPerson() {
+        return person;
     }
 }

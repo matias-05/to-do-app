@@ -1,11 +1,12 @@
 package app.todo.views.tareaspendientes;
+
 //#region imports
 import org.springframework.data.domain.Pageable;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
-
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -22,8 +23,9 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-
+import app.todo.data.Person;
 import app.todo.data.Task;
+import app.todo.services.PersonService;
 import app.todo.services.TaskService;
 //#endregion
 
@@ -34,18 +36,17 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
 
     //Declaración de componentes
     private final TaskService taskService;
-    final TextField description;
-    final DatePicker dueDate;
-    final Button createBtn;
-    final Grid<Task> taskGrid;
+    private final PersonService personService;
+    private final Grid<Task> taskGrid;
 
-    public TareasPendientesView(TaskService taskService) {
+    public TareasPendientesView(TaskService taskService, PersonService personService) {
 
         HorizontalLayout layoutRow = new HorizontalLayout();
         this.taskService = taskService;
-        
+        this.personService = personService;
+
         // Configuración de descripcion
-        description = new TextField();
+        TextField description = new TextField();
         description.setPlaceholder("Escribe tu tarea aquí");
         description.setAriaLabel("Task description");
         description.setMaxLength(Task.DESCRIPTION_MAX_LENGTH);
@@ -55,23 +56,25 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
         description.setHeight("50px");
 
         // Configuración de fecha de vencimiento
-        dueDate = new DatePicker();
+        DatePicker dueDate = new DatePicker();
         dueDate.setPlaceholder("Due date");
         dueDate.setAriaLabel("Due date");
         dueDate.setLabel("Vencimiento de la tarea");
         dueDate.setWidth("190px");
         dueDate.setHeight("50px");
 
-        // Configuración del botón de crear tarea
-        createBtn = new Button("Create", event -> {createTask(); refreshGrid();});
-        createBtn.setText("Agregar");
-        createBtn.setWidth("20px");
-        createBtn.setHeight("30px");
-        createBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        // Configuración de persona encargada
+        ComboBox<Person> assignedTo = new ComboBox<>();
+        assignedTo.setPlaceholder("Asignar a");
+        assignedTo.setAriaLabel("Assigned to");
+        assignedTo.setLabel("Asignar a");
+        assignedTo.setItems(personService.list(Pageable.unpaged()).stream().toList());
+        assignedTo.setItemLabelGenerator(Person::toString);
+        assignedTo.setWidth("190px");
+        assignedTo.setHeight("50px");
 
         // Configuración del grid de tareas
         taskGrid = new Grid<>(Task.class, false);
-        
         taskGrid.addComponentColumn(task -> {
             Button doneBtn = new Button(VaadinIcon.CHECK_CIRCLE.create(), event -> {
                 Dialog confirmDialog = new Dialog();
@@ -92,14 +95,14 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
             });
             doneBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             return doneBtn;
-        }).setHeader("Marcar como hecho").setWidth("200px").setFlexGrow(0);
+        }).setHeader("Marcar como hecho").setAutoWidth(true).setFlexGrow(0); 
         taskGrid.addColumn(Task::getDescription).setHeader("Descripción").setAutoWidth(true);
-        taskGrid.addColumn(Task::getDueDate).setHeader("Vencimiento").setWidth("50px");
+        taskGrid.addColumn(Task::getDueDate).setHeader("Vencimiento").setAutoWidth(true);
+        taskGrid.addColumn(task -> task.getPerson().getName()).setHeader("Asignado a").setAutoWidth(true);
         taskGrid.addComponentColumn(task -> {
             Button deleteBtn = new Button(VaadinIcon.CLOSE.create(), event -> {
                 Dialog confirmDialog = new Dialog();
                 confirmDialog.add(new Span("¿Estás seguro de que deseas enviar esta tarea a la papelera?"));
-
                 Button confirmButton = new Button("Borrar", e -> {
                     task.setInTrash(true);
                     taskService.updateTask(task);
@@ -116,7 +119,21 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
             return deleteBtn;
         }).setHeader("Borrar").setAutoWidth(true).setFlexGrow(0).setTextAlign(ColumnTextAlign.START);
+
+        // Configuración del botón de crear tarea
+        Button createBtn = new Button("Create", event -> {
+            taskService.createTask(description.getValue(), dueDate.getValue(), assignedTo.getValue());
+            taskGrid.getDataProvider().refreshAll();
+            description.clear();
+            dueDate.clear();
+            refreshGrid();
+        });
+        createBtn.setText("Agregar");
+        createBtn.setWidth("20px");
+        createBtn.setHeight("30px");
+        createBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         
+        // Configuracion del frontend
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(JustifyContentMode.START);
@@ -132,18 +149,11 @@ public class TareasPendientesView extends Composite<VerticalLayout> {
         layoutRow.add(dueDate);
         layoutRow.add(createBtn);
         getContent().add(layoutRow, taskGrid);
-        layoutRow.add(description, dueDate, createBtn);    
+        layoutRow.add(description, dueDate, assignedTo, createBtn);    
         refreshGrid();
     }
     
     //Metodos
-    public void createTask() {
-        taskService.createTask(description.getValue(), dueDate.getValue());
-        taskGrid.getDataProvider().refreshAll();
-        description.clear();
-        dueDate.clear();
-        
-    }
     private void refreshGrid() {
         taskGrid.setItems(
             taskService.list(Pageable.unpaged())
