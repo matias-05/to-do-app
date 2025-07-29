@@ -1,6 +1,6 @@
 # 📋 Aplicación de Lista de Tareas con Vaadin Flow
 
-Una aplicación web desarrollada con **Java** y **Vaadin Flow** para gestionar tareas de forma sencilla. Permite agregar tareas, eliminarlas y asignarlas a personas. La base de datos utilizada es **PostgreSQL**.
+Una aplicación web desarrollada con **Java** y **Vaadin Flow** para gestionar tareas de forma sencilla. Permite agregar tareas, eliminarlas y asignarlas a personas.
 
 ---
 
