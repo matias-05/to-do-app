@@ -23,6 +23,6 @@ Una aplicación web desarrollada con **Java** y **Vaadin Flow** para gestionar t
 
 ---
 
-## 🗂️ Estructura del Proyecto
+
 
 
