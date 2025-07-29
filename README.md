@@ -9,7 +9,7 @@ Una aplicación web desarrollada con **Java** y **Vaadin Flow** para gestionar t
 - ✅ Agregar nuevas tareas.
 - 🗑️ Eliminar tareas existentes.
 - 👤 Asignar tareas a personas.
-- 📋 Visualización en tiempo real con interfaz responsiva basada en **Vaadin Flow**.
+- 📋 Visualización en tiempo real con interfaz basada en **Vaadin Flow**.
 
 ---
 
@@ -18,8 +18,8 @@ Una aplicación web desarrollada con **Java** y **Vaadin Flow** para gestionar t
 - **Java 17+**
 - **Vaadin Flow (v24+)**
 - **PostgreSQL**
-- **Spring Boot** (opcional, si estás usando integración con Spring)
-- **Maven** o **Gradle** como gestor de dependencias.
+- **Spring Boot**
+- **Maven**
 
 ---
 
